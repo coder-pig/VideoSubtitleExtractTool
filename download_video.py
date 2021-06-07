@@ -32,7 +32,7 @@ url_match_pattern = re.compile(r'((ht|f)tps?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-\.,@?
                                re.S)
 
 # 保存文件的目录
-before_video_dir = os.path.join(os.getcwd(), config_getter.get_config(key='before_video_dir'))
+video_before_dir = os.path.join(os.getcwd(), config_getter.get_config(key='video_before_dir'))
 origin_video_dir = os.path.join(os.getcwd(), config_getter.get_config(key='origin_video_dir'))
 audio_after_dir = os.path.join(os.getcwd(), config_getter.get_config(key='audio_after_dir'))
 subtitle_before_dir = os.path.join(os.getcwd(), config_getter.get_config(key='subtitle_before_dir'))
@@ -61,7 +61,7 @@ cookies_jar = cookiejar.MozillaCookieJar(cookies_file_path) if os.path.exists(co
 
 # 初始化的方法
 def init():
-    cp_utils.is_dir_existed(before_video_dir)
+    cp_utils.is_dir_existed(video_before_dir)
     cp_utils.is_dir_existed(origin_video_dir)
     cp_utils.is_dir_existed(audio_after_dir)
     cp_utils.is_dir_existed(subtitle_before_dir)
@@ -185,7 +185,7 @@ def download_normal(url, referer_url, file_type, title=''):
     headers['Referer'] = referer_url
     print("下载：", url)
 
-    file_name = '{}{}{}_{}.{}'.format(before_video_dir, os.path.sep, title, str(int(round(time.time() * 1000))),
+    file_name = '{}{}{}_{}.{}'.format(video_before_dir, os.path.sep, title, str(int(round(time.time() * 1000))),
                                       file_type)
     resp = r.get(url=url, headers=headers)
     with open(file_name, "wb+") as f:
@@ -199,9 +199,9 @@ def download_idm(url, referer_url, file_type, title=''):
     print("下载：", url)
     file_name = '{}_{}.{}'.format(title, str(int(round(time.time() * 1000))), file_type)
     downloader = IDMan()
-    downloader.download(url, path_to_save=before_video_dir, output=file_name, referrer=referer_url)
+    downloader.download(url, path_to_save=video_before_dir, output=file_name, referrer=referer_url)
     print("下载完成：", url)
-    return os.path.join(before_video_dir, file_name)
+    return os.path.join(video_before_dir, file_name)
 
 
 # you-get下载
@@ -264,7 +264,7 @@ if __name__ == '__main__':
                                 b_video_path = download_idm(bv_video_url, input_url, 'mp4', choose_video.title)
                                 b_audio_path = download_idm(bv_audio_url, input_url, 'mp4', choose_video.title)
                                 # idm是异步的，拿不到下载进度，这里休眠30s，避免等下出现文件未合并的情况
-                                time.sleep(30)
+                                time.sleep(60)
                                 print("音视频下载完毕，准备合并")
                                 merge_mp4_wav(b_video_path, b_audio_path, after_video_path)
                             else:
