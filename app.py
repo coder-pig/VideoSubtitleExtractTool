@@ -14,7 +14,8 @@ import re
 import time
 
 import speech_recognition as sr
-from pydub import AudioSegment as pydub_as
+from pydub import AudioSegment as pydub_as, AudioSegment
+from sphfile import SPHFile
 from you_get import common as you_get
 
 import config_getter
@@ -117,12 +118,12 @@ if __name__ == '__main__':
             else:
                 print("序号选择错误")
     elif choose_input == "5":
-        # mp3_path = os.path.join(audio_after_dir, "1610545418381/0.mp3")
+        mp3_path = os.path.join(audio_after_dir, "1610545418381/0.mp3")
         wav_path = os.path.join(audio_after_dir, "1610607876412/12.wav")
-        # mp3_file = AudioSegment.from_mp3(mp3_path)
-        # mp3_file.export(wav_path, format="wav")
-        # file = SPHFile(wav_path)
-        # file.write_wav(filename=wav_path)
+        mp3_file = AudioSegment.from_mp3(mp3_path)
+        mp3_file.export(wav_path, format="wav")
+        file = SPHFile(wav_path)
+        file.write_wav(filename=wav_path)
         print(wav_path)
         r = sr.Recognizer()
         test = sr.AudioFile(wav_path)

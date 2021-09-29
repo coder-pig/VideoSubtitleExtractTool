@@ -5,7 +5,7 @@
    File     : config_getter.py
    Author   : CoderPig
    date     : 2021-01-13 11:33 
-   Desc     : 
+   Desc     : 读取配置文件配置
 -------------------------------------------------
 """
 import configparser
@@ -19,7 +19,7 @@ def get_config(section='config', key=None):
     return config.get(section, key)
 
 
-def get_user(section='user', key=None):
+def get_api(section='api', key=None):
     config = configparser.ConfigParser()
-    config.read(os.path.join(os.path.split(os.path.realpath(__file__))[0], 'user.ini'), encoding='utf8')
+    config.read(os.path.join(os.path.split(os.path.realpath(__file__))[0], 'api.ini'), encoding='utf8')
     return config.get(section, key)

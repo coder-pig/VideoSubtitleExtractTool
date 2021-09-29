@@ -5,7 +5,7 @@
    File     : extract_text_by_api.py
    Author   : CoderPig
    date     : 2021-01-28 15:42 
-   Desc     : 利用APP的API生成字幕
+   Desc     : 调用APP的API生成字幕
 -------------------------------------------------
 """
 import hashlib
@@ -18,12 +18,15 @@ from pydub import AudioSegment
 
 import cp_utils
 
-host = 'app.xunjiepdf.com'
 # 用户信息
-device_id = config_getter.get_user(key='device_id')
-account = config_getter.get_user(key='account')
-user_token = config_getter.get_user(key='user_token')
-machine_id = config_getter.get_user(key='machine_id')
+host = config_getter.get_api(key='host')
+product_info = config_getter.get_api(key='product_info')
+software_name = config_getter.get_api(key='software_name')
+device_id = config_getter.get_api(key='device_id')
+account = config_getter.get_api(key='account')
+user_token = config_getter.get_api(key='user_token')
+machine_id = config_getter.get_api(key='machine_id')
+
 # 相关目录
 origin_video_dir = os.path.join(os.getcwd(), config_getter.get_config(key="origin_video_dir"))
 srt_save_dir = os.path.join(os.getcwd(), config_getter.get_config(key="srt_save_dir"))
@@ -31,6 +34,7 @@ audio_after_dir = os.path.join(os.getcwd(), config_getter.get_config(key="audio_
 wav_to_mp3_dir = os.path.join(os.getcwd(), config_getter.get_config(key="wav_to_mp3_dir"))
 subtitle_before_dir = os.path.join(os.getcwd(), config_getter.get_config(key="subtitle_before_dir"))
 subtitle_after_dir = os.path.join(os.getcwd(), config_getter.get_config(key="subtitle_after_dir"))
+
 # API接口
 base_url = 'https://{}/api/v4/'.format(host)
 member_profile_url = base_url + "memprofile"
@@ -38,9 +42,6 @@ upload_par_url = base_url + "uploadpar"
 upload_file_url = base_url + "uploadfile"
 task_state_url = base_url + "taskstate"
 task_down_url = base_url + "taskdown"
-# 常量字段
-product_info = 'F5030BB972D508DCC0CA18BDF7AE48E26717591F38906C09587358DAAC0092F0'
-software_name = '录音转文字助手'
 
 # 普通请求头
 okhttp_headers = {
@@ -293,14 +294,18 @@ class TaskInfo:
 
 
 if __name__ == '__main__':
+    # 文件夹初始化
     cp_utils.is_dir_existed(origin_video_dir)
     cp_utils.is_dir_existed(audio_after_dir)
     cp_utils.is_dir_existed(wav_to_mp3_dir)
     cp_utils.is_dir_existed(srt_save_dir)
     cp_utils.is_dir_existed(subtitle_after_dir)
+    # 遍历视频文件
     flv_file_list = cp_utils.filter_file_type(origin_video_dir, '.flv')
     mp4_file_list = cp_utils.filter_file_type(origin_video_dir, '.mp4')
+    ts_file_list = cp_utils.filter_file_type(origin_video_dir, '.ts')
     flv_file_list += mp4_file_list
+    flv_file_list += ts_file_list
     if len(flv_file_list) == 0:
         print("待处理视频为空")
         exit(0)
