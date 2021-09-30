@@ -260,6 +260,64 @@ class TaskInfo:
         self.timestamp = timestamp
 
 
+def function():
+    # 文件夹初始化
+    cp_utils.is_dir_existed(origin_video_dir)
+    cp_utils.is_dir_existed(audio_after_dir)
+    cp_utils.is_dir_existed(wav_to_mp3_dir)
+    cp_utils.is_dir_existed(srt_save_dir)
+    cp_utils.is_dir_existed(subtitle_after_dir)
+    # 遍历视频文件
+    flv_file_list = cp_utils.filter_file_type(origin_video_dir, '.flv')
+    mp4_file_list = cp_utils.filter_file_type(origin_video_dir, '.mp4')
+    ts_file_list = cp_utils.filter_file_type(origin_video_dir, '.ts')
+    flv_file_list += mp4_file_list
+    flv_file_list += ts_file_list
+    if len(flv_file_list) == 0:
+        print("待处理视频为空")
+        exit(0)
+    print("\n请选择要提取字幕的视频序号：\n{}".format('=' * 64))
+    for pos, video_path in enumerate(flv_file_list):
+        print("{} → {}".format(pos, video_path))
+    print("=" * 64)
+    file_choose_index = int(input())
+    file_choose_path = flv_file_list[file_choose_index]
+    input_duration = int(input("请输入分割长度，单位s，输入0表示不切割直接转换 \n"))
+    print("开始切割，请稍后...")
+    wav_output_dir = media_utils.video_to_wav(file_choose_path, input_duration)
+    wav_file_list = cp_utils.filter_file_type(wav_output_dir, '.wav')
+    print("切割完成，请选择后续操作：\n{}\n1、完整转换\n2、处理单独的视频片段\n{}".format('=' * 64, '=' * 64))
+    translate_choose_input = int(input())
+    if translate_choose_input == 1:
+        print("开始转换全部音频")
+        subtitle_path_list = []
+        dir_name = str(int(time.time()))
+        dir_name_path = os.path.join(wav_to_mp3_dir)
+        cp_utils.is_dir_existed(dir_name_path)
+        for index, wav_file in enumerate(wav_file_list):
+            print("处理第{}段视频：{}".format(index + 1, wav_file))
+            mp3_output_path = os.path.join(dir_name_path, '{}.mp3'.format(int(time.time())))
+            subtitle_path_list.append(save_subtitle(wav_file, mp3_output_path, dir_name))
+        # 合并多个字幕文件
+        print("开始字幕合并...")
+        all_subtitle = ''
+        all_subtitle_file = os.path.join(subtitle_after_dir, '{}.txt'.format(int(time.time())))
+        for txt in subtitle_path_list:
+            with open(txt, 'r', encoding='utf-8') as tf:
+                all_subtitle += tf.read()
+        with open(all_subtitle_file, 'w+', encoding='utf-8') as atf:
+            atf.write(all_subtitle)
+        print("合并完毕，输出文件：", all_subtitle_file)
+    else:
+        print("\n请选择要处理音频片段序号：")
+        for pos, wav_path in enumerate(wav_file_list):
+            print("{} → {}".format(pos, wav_path))
+        wav_choose_index = int(input())
+        wav_input_path = wav_file_list[wav_choose_index]
+        mp3_output_path = os.path.join(wav_to_mp3_dir, '{}.mp3'.format(int(time.time())))
+        save_subtitle(wav_input_path, mp3_output_path)
+
+
 if __name__ == '__main__':
     # 文件夹初始化
     cp_utils.is_dir_existed(origin_video_dir)
