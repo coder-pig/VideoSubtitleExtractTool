@@ -15,6 +15,7 @@ import time
 import config_getter
 import requests as r
 from pydub import AudioSegment
+import media_utils
 
 import cp_utils
 
@@ -55,40 +56,6 @@ upload_headers = {
     'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 8; Mi 20 Build/QQ3A.200805.001)',
     'Content-Type': 'application/octet-stream'
 }
-
-
-# 视频转换成多个wav文件
-def video_to_wav(file_path, seconds):
-    part_duration = seconds * 1000
-    print(file_path)
-    if file_path.endswith(".flv"):
-        video = AudioSegment.from_flv(file_path)
-    else:
-        video = AudioSegment.from_file(file_path, format=file_path[-3:])
-    # 获取文件名称
-    src_file_name = file_path.split(os.path.sep)[-1].split('.')[0] + '_' + str(int(round(time.time() * 1000)))
-    wav_save_dir = os.path.join(audio_after_dir, src_file_name)
-    cp_utils.is_dir_existed(wav_save_dir)
-    video_duration = int(video.duration_seconds * 1000)  # 获取视频时长
-    if part_duration == 0:
-        print("完整视频转换为wav文件...\n")
-        wav_part = video[0: video_duration]
-        wav_part.export(os.path.join(wav_save_dir, "{}.wav".format('all')), format="wav")
-    else:
-        part_count = math.ceil(video_duration / part_duration)  # 裁剪录音段数
-        last_start = video_duration - video_duration % part_duration
-        print("待处理视频时长为：{}，裁剪为：{} 段".format(video_duration, part_count))
-        for part in range(0, part_count - 1):
-            start = part * part_duration
-            end = (part + 1) * part_duration - 1
-            wav_part = video[start: end]
-            print("导出时间段：{} - {}".format(start, end))
-            wav_part.export(os.path.join(wav_save_dir, "{}.wav".format(part)), format="wav")
-        # 剩下一段
-        wav_part = video[last_start: video_duration]
-        print("导出时间段：{} - {}".format(last_start, video_duration))
-        wav_part.export(os.path.join(wav_save_dir, "{}.wav".format(part_count - 1)), format="wav")
-    return wav_save_dir
 
 
 # 获取用户信息
@@ -317,7 +284,7 @@ if __name__ == '__main__':
     file_choose_path = flv_file_list[file_choose_index]
     input_duration = int(input("请输入分割长度，单位s，输入0表示不切割直接转换 \n"))
     print("开始切割，请稍后...")
-    wav_output_dir = video_to_wav(file_choose_path, input_duration)
+    wav_output_dir = media_utils.video_to_wav(file_choose_path, input_duration)
     wav_file_list = cp_utils.filter_file_type(wav_output_dir, '.wav')
     print("切割完成，请选择后续操作：\n{}\n1、完整转换\n2、处理单独的视频片段\n{}".format('=' * 64, '=' * 64))
     translate_choose_input = int(input())
