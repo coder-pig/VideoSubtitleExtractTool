@@ -8,17 +8,17 @@
    Desc     : 下载视频(除B站提供破解下载外，默认使用you_get下载)
 -------------------------------------------------
 """
+import json
+import os
+import re
+import time
+from http import cookiejar
+
 import requests as r
 from idm import IDMan
 from you_get import common as you_get
-import cp_utils
+
 import config_getter
-import re
-import json
-import subprocess
-import os
-import time
-from http import cookiejar
 import media_utils
 
 base_url = 'https://www.bilibili.com'
@@ -228,6 +228,7 @@ def download_idm(url, referer_url, file_type, title=''):
 
 # you-get下载
 def you_get_download(url):
+    # 判断是否为B站视频，检索是否有cookies文件，有的话设置下
     if url.find('bilibili') != -1:
         if os.path.exists(cookies_file_path):
             you_get.load_cookies(cookies_file_path)

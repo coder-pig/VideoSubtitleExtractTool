@@ -260,31 +260,16 @@ class TaskInfo:
         self.timestamp = timestamp
 
 
-def function():
+def function(video_path):
     # 文件夹初始化
     cp_utils.is_dir_existed(origin_video_dir)
     cp_utils.is_dir_existed(audio_after_dir)
     cp_utils.is_dir_existed(wav_to_mp3_dir)
     cp_utils.is_dir_existed(srt_save_dir)
     cp_utils.is_dir_existed(subtitle_after_dir)
-    # 遍历视频文件
-    flv_file_list = cp_utils.filter_file_type(origin_video_dir, '.flv')
-    mp4_file_list = cp_utils.filter_file_type(origin_video_dir, '.mp4')
-    ts_file_list = cp_utils.filter_file_type(origin_video_dir, '.ts')
-    flv_file_list += mp4_file_list
-    flv_file_list += ts_file_list
-    if len(flv_file_list) == 0:
-        print("待处理视频为空")
-        exit(0)
-    print("\n请选择要提取字幕的视频序号：\n{}".format('=' * 64))
-    for pos, video_path in enumerate(flv_file_list):
-        print("{} → {}".format(pos, video_path))
-    print("=" * 64)
-    file_choose_index = int(input())
-    file_choose_path = flv_file_list[file_choose_index]
     input_duration = int(input("请输入分割长度，单位s，输入0表示不切割直接转换 \n"))
     print("开始切割，请稍后...")
-    wav_output_dir = media_utils.video_to_wav(file_choose_path, input_duration)
+    wav_output_dir = media_utils.video_to_wav(video_path, input_duration)
     wav_file_list = cp_utils.filter_file_type(wav_output_dir, '.wav')
     print("切割完成，请选择后续操作：\n{}\n1、完整转换\n2、处理单独的视频片段\n{}".format('=' * 64, '=' * 64))
     translate_choose_input = int(input())
@@ -316,6 +301,7 @@ def function():
         wav_input_path = wav_file_list[wav_choose_index]
         mp3_output_path = os.path.join(wav_to_mp3_dir, '{}.mp3'.format(int(time.time())))
         save_subtitle(wav_input_path, mp3_output_path)
+    print("=" * 64 + "\n")
 
 
 if __name__ == '__main__':

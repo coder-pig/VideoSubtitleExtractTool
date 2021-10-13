@@ -60,3 +60,14 @@ def filter_file_type(file_dir, file_suffix):
         if file_path.endswith(file_suffix):
             result_list.append(file_path)
     return result_list
+
+
+# 获取目录下多种后缀的文件路径列表
+def filter_file_by_types(file_dir, *file_suffix):
+    result_list = []
+    file_path_list = fetch_all_file(file_dir)
+    for file_path in file_path_list:
+        for suffix in file_suffix:
+            if file_path.endswith(suffix):
+                result_list.append(file_path)
+    return result_list
